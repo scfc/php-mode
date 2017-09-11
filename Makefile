@@ -3,7 +3,7 @@ ELS = php-mode.el php-mode-test.el
 ELCS = $(ELS:.el=.elc)
 
 %.elc: %.el
-	$(EMACS) -Q -batch -L . -f batch-byte-compile $<
+	$(EMACS) -Q -batch -L . --eval '(setq byte-compile-error-on-warn t)' -f batch-byte-compile $<
 
 all: $(ELCS)
 
