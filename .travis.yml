@@ -2,10 +2,11 @@ language: emacs-lisp
 sudo: required
 env:
   matrix:
-    - EMACS_VERSION=emacs-24.3-bin
-    - EMACS_VERSION=emacs-24.4-bin
-    - EMACS_VERSION=emacs-24.5-bin
-    - EMACS_VERSION=emacs-25.1-bin
+    - EMACS_VERSION=emacs-24.3-travis
+    - EMACS_VERSION=emacs-24.4-travis
+    - EMACS_VERSION=emacs-24.5-travis
+    - EMACS_VERSION=emacs-25.1-travis
+    - EMACS_VERSION=emacs-25.2-travis
     - EMACS_VERSION=emacs-snapshot
 
 before_install:
@@ -18,10 +19,9 @@ before_install:
     fi
 
   # Use emacs version manager for all other versions.
-  - sudo mkdir /usr/local/evm
-  - sudo chown travis:travis /usr/local/evm
-  - export PATH="/home/travis/.evm/bin:$PATH"
-  - curl -fsSkL https://raw.github.com/rejeep/evm/master/go | bash
+  - git clone -q --depth=1 https://github.com/rejeep/evm.git $HOME/.evm
+  - export PATH="$HOME/.evm/bin:$PATH"
+  - evm config path /tmp
   - evm install $EMACS_VERSION --use || true
 
 script:
