@@ -1,30 +1,43 @@
-language: emacs-lisp
 sudo: required
+
 env:
   matrix:
-    - EMACS_VERSION=emacs-24.3-bin
-    - EMACS_VERSION=emacs-24.4-bin
-    - EMACS_VERSION=emacs-24.5-bin
-    - EMACS_VERSION=emacs-25.1-bin
-    - EMACS_VERSION=emacs-snapshot
+    - EMACS_VERSION=emacs-23.4-bin EVM_CONFIG_PATH=yes
+    - EMACS_VERSION=emacs-23.4-bin EVM_CONFIG_PATH=no
+    - EMACS_VERSION=emacs-23.4-travis EVM_CONFIG_PATH=yes
+    - EMACS_VERSION=emacs-23.4-travis EVM_CONFIG_PATH=no
+    - EMACS_VERSION=emacs-24.1-bin EVM_CONFIG_PATH=yes
+    - EMACS_VERSION=emacs-24.1-bin EVM_CONFIG_PATH=no
+    - EMACS_VERSION=emacs-24.1-travis EVM_CONFIG_PATH=yes
+    - EMACS_VERSION=emacs-24.1-travis EVM_CONFIG_PATH=no
+    - EMACS_VERSION=emacs-24.2-bin EVM_CONFIG_PATH=yes
+    - EMACS_VERSION=emacs-24.2-bin EVM_CONFIG_PATH=no
+    - EMACS_VERSION=emacs-24.2-travis EVM_CONFIG_PATH=yes
+    - EMACS_VERSION=emacs-24.2-travis EVM_CONFIG_PATH=no
+    - EMACS_VERSION=emacs-24.3-bin EVM_CONFIG_PATH=yes
+    - EMACS_VERSION=emacs-24.3-bin EVM_CONFIG_PATH=no
+    - EMACS_VERSION=emacs-24.3-travis EVM_CONFIG_PATH=yes
+    - EMACS_VERSION=emacs-24.3-travis EVM_CONFIG_PATH=no
+    - EMACS_VERSION=emacs-24.4-bin EVM_CONFIG_PATH=yes
+    - EMACS_VERSION=emacs-24.4-bin EVM_CONFIG_PATH=no
+    - EMACS_VERSION=emacs-24.4-travis EVM_CONFIG_PATH=yes
+    - EMACS_VERSION=emacs-24.4-travis EVM_CONFIG_PATH=no
+    - EMACS_VERSION=emacs-24.5-bin EVM_CONFIG_PATH=yes
+    - EMACS_VERSION=emacs-24.5-bin EVM_CONFIG_PATH=no
+    - EMACS_VERSION=emacs-24.5-travis EVM_CONFIG_PATH=yes
+    - EMACS_VERSION=emacs-24.5-travis EVM_CONFIG_PATH=no
+    - EMACS_VERSION=emacs-25.1-travis EVM_CONFIG_PATH=yes
+    - EMACS_VERSION=emacs-25.1-travis EVM_CONFIG_PATH=no
+    - EMACS_VERSION=emacs-25.2-travis EVM_CONFIG_PATH=yes
+    - EMACS_VERSION=emacs-25.2-travis EVM_CONFIG_PATH=no
 
 before_install:
-  # Use the ubuntu emacs teams regularly updated snapshot packages.
-  - if [ "$EMACS_VERSION" = 'emacs-snapshot' ]; then
-      sudo add-apt-repository -y ppa:ubuntu-elisp/ppa &&
-      sudo apt-get update -qq &&
-      sudo apt-get install -qq $EMACS_VERSION &&
-      sudo apt-get install -qq emacs-snapshot-el emacs-snapshot-nox;
-    fi
-
-  # Use emacs version manager for all other versions.
+  - git clone https://github.com/rejeep/evm.git /home/travis/.evm
+  - export PATH="/home/travis/.evm/bin:$PATH"
   - sudo mkdir /usr/local/evm
   - sudo chown travis:travis /usr/local/evm
-  - export PATH="/home/travis/.evm/bin:$PATH"
-  - curl -fsSkL https://raw.github.com/rejeep/evm/master/go | bash
-  - evm install $EMACS_VERSION --use || true
+  - if [ "$EVM_CONFIG_PATH" = yes ]; then evm config path /tmp; fi
+  - evm install "$EMACS_VERSION" --use
 
 script:
-  # Make sure the exact emacs version can be found in the build output.
   - emacs -Q --batch --eval '(message (emacs-version))'
-  - make test
